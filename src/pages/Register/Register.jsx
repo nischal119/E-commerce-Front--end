@@ -8,13 +8,28 @@ import {
   Typography,
 } from "@mui/material";
 import { Formik } from "formik";
-import React from "react";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import * as Yup from "yup";
+import { $axios } from "../../lib/axios";
+import CustomSnackbar from "../../components/CustomSnackbar";
 
 const Register = () => {
+  const [errorInfo, setErrorInfo] = useState({
+    isError: false,
+    errorMessage: "",
+  });
+
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
   return (
-    <>
-      <Typography variant="h2">Sign up</Typography>
+    <div style={{ display: "flex", width: "100vw", height: "100vh" }}>
+      <CustomSnackbar
+        open={errorInfo.isError}
+        status="error"
+        message={errorInfo.errorMessage}
+      />
       <Formik
         initialValues={{
           email: "",
@@ -68,15 +83,31 @@ const Register = () => {
             "Date of birth is required."
           ),
         })}
-        onSubmit={(values) => {
-          console.log(values);
+        onSubmit={async (values) => {
+          setLoading(true);
+          // api hit
+          try {
+            const response = await $axios.post("/user/register", values);
+
+            setLoading(false);
+
+            // route to login
+            navigate("/login");
+          } catch (error) {
+            setErrorInfo({
+              isError: true,
+              errorMessage: error.response.data.message,
+            });
+
+            setLoading(false);
+          }
         }}
       >
         {({ errors, handleSubmit, touched, getFieldProps }) => (
           <form
             onSubmit={handleSubmit}
             style={{
-              marginTop: "1rem",
+              margin: "auto",
               display: "flex",
               flexDirection: "column",
               gap: "1rem",
@@ -87,6 +118,12 @@ const Register = () => {
                 "rgba(17, 17, 26, 0.1) 0px 4px 16px, rgba(17, 17, 26, 0.1) 0px 8px 24px, rgba(17, 17, 26, 0.1) 0px 16px 56px",
             }}
           >
+            <Typography
+              variant="h3"
+              sx={{ textAlign: "center", color: "grey" }}
+            >
+              Sign up
+            </Typography>
             <TextField name="email" label="Email" {...getFieldProps("email")} />
             {touched.email && errors.email ? (
               <div className="error-message">{errors.email}</div>
@@ -151,13 +188,15 @@ const Register = () => {
               variant="contained"
               type="submit"
               sx={{ marginTop: "1rem" }}
+              disabled={loading}
             >
               Register
             </Button>
+            <Link to="/login">Already have an account?</Link>
           </form>
         )}
       </Formik>
-    </>
+    </div>
   );
 };
 
