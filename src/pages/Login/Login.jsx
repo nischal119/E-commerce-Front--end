@@ -1,11 +1,10 @@
-import React, { useState } from "react";
-import { Formik } from "formik";
-import * as Yup from "yup";
 import { Button, TextField, Typography } from "@mui/material";
-import { $axios } from "../../lib/axios";
+import { Formik } from "formik";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import Loader from "../../components/Loader";
+import * as Yup from "yup";
 import CustomSnackbar from "../../components/CustomSnackbar";
+import { $axios } from "../../lib/axios";
 
 const Login = () => {
   const [loading, setLoading] = useState(false);

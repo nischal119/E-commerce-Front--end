@@ -1,202 +1,239 @@
+// import { KeyboardDatePicker } from "@material-ui/pickers";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import {
   Button,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
+  IconButton,
+  Input,
+  InputAdornment,
   TextField,
-  Typography,
 } from "@mui/material";
-import { Formik } from "formik";
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import Select from "@mui/material/Select";
+import { ErrorMessage, Form, Formik } from "formik";
+import React from "react";
 import * as Yup from "yup";
-import { $axios } from "../../lib/axios";
-import CustomSnackbar from "../../components/CustomSnackbar";
+import "./register.styles.css";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const Register = () => {
-  const [errorInfo, setErrorInfo] = useState({
-    isError: false,
-    errorMessage: "",
-  });
+  const [showPassword, setShowPassword] = React.useState(false);
 
-  const [loading, setLoading] = useState(false);
+  const handleClickShowPassword = () => setShowPassword((show) => !show);
+
+  const handleMouseDownPassword = (event) => {
+    event.preventDefault();
+  };
   const navigate = useNavigate();
-
   return (
-    <div style={{ display: "flex", width: "100vw", height: "100vh" }}>
-      <CustomSnackbar
-        open={errorInfo.isError}
-        status="error"
-        message={errorInfo.errorMessage}
-      />
-      <Formik
-        initialValues={{
-          email: "",
-          password: "",
-          firstName: "",
-          lastName: "",
-          gender: "",
-          dob: "",
-          role: "",
-        }}
-        validationSchema={Yup.object({
-          email: Yup.string()
-            .email("Invalid email address.")
-            .required("Email is required.")
-            .min(5, "Must be at least 5 characters.")
-            .max(55, "Must be at most 55 characters.")
-            .trim(),
-          firstName: Yup.string()
-            .max(55, "Must be at most 55 characters.")
-            .required("First name is required.")
-            .min(2, "Must be at least 2 characters.")
-            .trim(),
-          lastName: Yup.string()
-            .max(55, "Must be at most 55 characters.")
-            .required("Last name is required.")
-            .min(2, "Must be at least 2 characters.")
-            .trim(),
-          password: Yup.string()
-            .max(25, "Must be at most 25 characters.")
-            .required("Password is required.")
-            //   .matches(
-            //     /^(?=.*[a-z])(?=.*[A-Z])(?=.*d)(?=.*[@$!%*?&])[A-Za-zd@$!%*?&]{8,}$/,
-            //     "Password must be at least 8 character with  at least 1 capital letter, 1 small letter, 1 number and 1 special character."
-            //   )
-            .trim(),
+    <Formik
+      initialValues={{
+        email: "",
+        password: "Nischal1234@",
+        firstName: "",
+        lastName: "",
+        gender: "",
+        role: "",
+        dob: "",
+      }}
+      validationSchema={Yup.object({
+        email: Yup.string()
+          .email("Invalid email address.")
+          .required("Email is required.")
+          .min(5, "Must be at least 5 characters.")
+          .max(55, "Must be at most 55 characters.")
+          .trim(),
+        firstName: Yup.string()
+          .max(55, "Must be at most 55 characters.")
+          .required("First name is required.")
+          .min(2, "Must be at least 2 characters.")
+          .trim(),
+        lastName: Yup.string()
+          .max(55, "Must be at most 55 characters.")
+          .required("Last name is required.")
+          .min(2, "Must be at least 2 characters.")
+          .trim(),
+        password: Yup.string()
+          .max(25, "Must be at most 25 characters.")
+          .required("Password is required.")
+          //   .matches(
+          //     /^(?=.*[a-z])(?=.*[A-Z])(?=.*d)(?=.*[@$!%*?&])[A-Za-zd@$!%*?&]{8,}$/,
+          //     "Password must be at least 8 character with  at least 1 capital letter, 1 small letter, 1 number and 1 special character."
+          //   )
+          .trim(),
 
-          gender: Yup.string()
-            .required("Please choose at least one gender.")
-            .trim()
-            .oneOf(
-              ["male", "female", "preferNotToSay"],
-              "Gender must be male,female or prefer not to say."
-            ),
-
-          role: Yup.string()
-            .required("Please choose at least one role.")
-            .trim()
-            .oneOf(["buyer", "seller"]),
-
-          dob: Yup.date("Must be valid date.").required(
-            "Date of birth is required."
+        gender: Yup.string()
+          .required("Please choose at least one gender.")
+          .trim()
+          .oneOf(
+            ["male", "female", "preferNotToSay"],
+            "Gender must be male,female or prefer not to say."
           ),
-        })}
-        onSubmit={async (values) => {
-          setLoading(true);
-          // api hit
-          try {
-            const response = await $axios.post("/user/register", values);
 
-            setLoading(false);
+        role: Yup.string()
+          .required("Please choose at least one role.")
+          .trim()
+          .oneOf(["buyer", "seller"]),
 
-            // route to login
-            navigate("/login");
-          } catch (error) {
-            setErrorInfo({
-              isError: true,
-              errorMessage: error.response.data.message,
-            });
+        dob: Yup.date("Must be valid date.").required(
+          "Date of birth is required."
+        ),
+      })}
+      onSubmit={async (values) => {
+        // console.log(values);
+        try {
+          const response = await axios.post(
+            "http://localhost:8000/user/register",
+            values
+          );
+          console.log(response);
+        } catch (error) {
+          console.log(error.response.data);
+        }
+      }}
+    >
+      {({ values, handleChange, handleSubmit }) => (
+        <Form
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            boxShadow:
+              "rgba(14, 30, 37, 0.12) 0px 2px 4px 0px, rgba(14, 30, 37, 0.32) 0px 2px 16px 0px",
+            width: "500px",
+            alignSelf: "center",
+            padding: "30px",
+          }}
+          className="form"
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleSubmit();
+          }}
+        >
+          {/* <img src="../../public/berry logo.png" alt="hel" /> */}
+          <h1 className="purple"> Sign Up </h1>
+          <p className="para">Enter your credentials to continue</p>
 
-            setLoading(false);
-          }
-        }}
-      >
-        {({ errors, handleSubmit, touched, getFieldProps }) => (
-          <form
-            onSubmit={handleSubmit}
-            style={{
-              margin: "auto",
-              display: "flex",
-              flexDirection: "column",
-              gap: "1rem",
-              padding: "2rem",
-              minWidth: "350px",
-              borderRadius: "10px",
-              boxShadow:
-                "rgba(17, 17, 26, 0.1) 0px 4px 16px, rgba(17, 17, 26, 0.1) 0px 8px 24px, rgba(17, 17, 26, 0.1) 0px 16px 56px",
-            }}
+          <p style={{ textAlign: "center" }}>
+            {" "}
+            {/* <b>Sign Up with email address</b> */}
+          </p>
+
+          <TextField
+            sx={{ margin: "20px" }}
+            label="Email"
+            variant="standard"
+            name="email"
+            value={values.email}
+            onChange={handleChange}
+          />
+          <ErrorMessage name="email" className="error-message" />
+
+          <TextField
+            sx={{ margin: "20px" }}
+            label="First Name"
+            variant="standard"
+            name="firstName"
+            value={values.firstName}
+            onChange={handleChange}
+          />
+          <ErrorMessage name="firstName" />
+
+          <TextField
+            sx={{ margin: "20px" }}
+            label="Last Name"
+            variant="standard"
+            name="lastName"
+            value={values.lastName}
+            onChange={handleChange}
+          />
+          <ErrorMessage name="lastName" />
+
+          <FormControl
+            sx={{ m: 1, width: "25ch", margin: "20px 10px" }}
+            variant="standard"
           >
-            <Typography
-              variant="h3"
-              sx={{ textAlign: "center", color: "grey" }}
-            >
-              Sign up
-            </Typography>
-            <TextField name="email" label="Email" {...getFieldProps("email")} />
-            {touched.email && errors.email ? (
-              <div className="error-message">{errors.email}</div>
-            ) : null}
-
-            <TextField
-              name="firstName"
-              label="First name"
-              {...getFieldProps("firstName")}
-            />
-            {touched.firstName && errors.firstName ? (
-              <div className="error-message">{errors.firstName}</div>
-            ) : null}
-
-            <TextField
-              name="lastName"
-              label="Last name"
-              {...getFieldProps("lastName")}
-            />
-            {touched.lastName && errors.lastName ? (
-              <div className="error-message">{errors.lastName}</div>
-            ) : null}
-
-            <TextField
+            <InputLabel
+              sx={{ marginLeft: "13px", marginBottom: "10px" }}
+              htmlFor="standard-adornment-password"
               name="password"
-              label="Password"
-              type="password"
-              {...getFieldProps("password")}
-            />
-            {touched.password && errors.password ? (
-              <div className="error-message">{errors.password}</div>
-            ) : null}
-
-            <FormControl fullWidth>
-              <InputLabel>Gender</InputLabel>
-              <Select name="gender" label="Gender" {...getFieldProps("gender")}>
-                <MenuItem value="male">Male</MenuItem>
-                <MenuItem value="female">Female</MenuItem>
-                <MenuItem value="preferNotToSay">Prefer not to say</MenuItem>
-              </Select>
-              {touched.gender && errors.gender ? (
-                <div className="error-message">{errors.gender}</div>
-              ) : null}
-            </FormControl>
-            <FormControl fullWidth>
-              <InputLabel>Role</InputLabel>
-              <Select name="role" label="Role" {...getFieldProps("role")}>
-                <MenuItem value="buyer">Buyer</MenuItem>
-                <MenuItem value="seller">Seller</MenuItem>
-              </Select>
-              {touched.role && errors.role ? (
-                <div className="error-message">{errors.role}</div>
-              ) : null}
-            </FormControl>
-
-            <TextField name="dob" label="DOB" {...getFieldProps("dob")} />
-            {touched.dob && errors.dob ? (
-              <div className="error-message">{errors.dob}</div>
-            ) : null}
-
-            <Button
-              variant="contained"
-              type="submit"
-              sx={{ marginTop: "1rem" }}
-              disabled={loading}
             >
-              Register
-            </Button>
-            <Link to="/login">Already have an account?</Link>
-          </form>
-        )}
-      </Formik>
-    </div>
+              Password
+            </InputLabel>
+            <Input
+              fullWidth
+              sx={{ marginLeft: "13px", width: "211%" }}
+              id="standard-adornment-password"
+              type={showPassword ? "text" : "password"}
+              endAdornment={
+                <InputAdornment position="end">
+                  <IconButton
+                    aria-label="toggle password visibility"
+                    onClick={handleClickShowPassword}
+                    onMouseDown={handleMouseDownPassword}
+                  >
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              }
+            />
+          </FormControl>
+          <ErrorMessage name="password" />
+
+          <FormControl sx={{ margin: "20px" }}>
+            <InputLabel id="gender-label">Gender</InputLabel>
+            <Select
+              labelId="gender-label"
+              id="gender"
+              name="gender"
+              value={values.gender}
+              onChange={handleChange}
+              label="Gender"
+            >
+              <MenuItem value="male">Male</MenuItem>
+              <MenuItem value="female">Female</MenuItem>
+              <MenuItem value="preferNotToSay">Prefer not to say</MenuItem>
+            </Select>
+            <ErrorMessage name="gender" />
+          </FormControl>
+
+          <FormControl sx={{ margin: "20px" }}>
+            <InputLabel id="role-label">Role</InputLabel>
+            <Select
+              labelId="role-label"
+              id="role"
+              name="role"
+              value={values.role}
+              onChange={handleChange}
+              label="Role"
+            >
+              <MenuItem value="buyer">Buyer</MenuItem>
+              <MenuItem value="seller">Seller</MenuItem>
+            </Select>
+            <ErrorMessage name="role" />
+          </FormControl>
+
+          <TextField
+            sx={{ margin: "20px" }}
+            label="Date of Birth"
+            variant="standard"
+            name="dob"
+            value={values.dob}
+            onChange={handleChange}
+          />
+          <ErrorMessage name="dob" />
+          {/* {console.log(values)} */}
+          <Button variant="contained" type="submit" className="purple">
+            Register
+          </Button>
+          <Link className="link" to="/login">
+            Already have an account?{" "}
+          </Link>
+        </Form>
+      )}
+    </Formik>
   );
 };
 

@@ -1,11 +1,7 @@
 import React from "react";
-
+import "./home.module.css";
 const Home = () => {
-  return (
-    <div style={{ height: "100vh", width: "100vw" }}>
-      <div>Home</div>
-    </div>
-  );
+  return <div>home</div>;
 };
 
 export default Home;
